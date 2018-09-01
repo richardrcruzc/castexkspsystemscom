@@ -6,80 +6,125 @@
 @inject IUserAgentHelper userAgentHelper
 @if (Model.IsRental)
 {
-<div class="attributes rental-attributes">
-    <script language="javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!---*** End: JQuery 3.3.1 version. ***--->
-    <!---*** Start: Bootstrap 3.3.7 version files. ***--->
-    <script language="javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <!---*** End: Bootstrap 3.3.7 version files. ***--->
+    <link rel="stylesheet" type="text/css" href="/css/jquery.datetimepicker.css" />
+    <script src="/js/jquery.datetimepicker.js" type="text/javascript"></script>
+    <script src="/js/moment.js" type="text/javascript"></script>
 
-    <script language="javascript" src="https://momentjs.com/downloads/moment.js"></script>
-    <script language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/js/bootstrap-datetimepicker.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.43/css/bootstrap-datetimepicker.min.css">
+    <div class="attributes rental-attributes">
+        @{
+            var startDateControlId = $"rental_start_date_{Model.Id}";
+            var endDateControlId = $"rental_end_date_{Model.Id}";
+            //currenly we support only this format
+            //java-script format
+            const string datePickerFormat = "mm/dd/yy";
+            //C# format for ToString method
+            const string datePickerFormat2 = "MM/DD/YYYY h:mm a";
+            var isMobileDevice = userAgentHelper.IsMobileDevice();
+            <div class="attribute-item">
 
-
-
-    @{
-        var startDateControlId = $"rental_start_date_{Model.Id}";
-        var endDateControlId = $"rental_end_date_{Model.Id}";
-        //currenly we support only this format
-        //java-script format
-        const string datePickerFormat = "DD/MM/YYYY hh:mm A";
-        //C# format for ToString method
-        const string datePickerFormat2 = "MM/dd/yyyy";
-        var isMobileDevice = userAgentHelper.IsMobileDevice();
-
-      
-        <div class="attribute-item">
-            <div class="attribute-label">
-                <label class="text-prompt">
-                    @T("Products.RentalStartDate"):
-                </label>
-                <span class="required">*</span>
-            </div>
-            <div class="attribute-data">
-                
-                <input id="@(startDateControlId)" name="@(startDateControlId)" type="text" class="datepicker" value="@(Model.RentalStartDate.HasValue ? Model.RentalStartDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)" @if (isMobileDevice) { <text> readonly</text>} />
-                <script asp-location="Footer">
+               
+                <script type="text/javascript" asp-location="Footer">
                     $(document).ready(function () {
+
+
+                        $.datetimepicker.setDateFormatter({
+                            parseDate: function (date, format) {
+                                var d = moment(date, format);
+                                return d.isValid() ? d.toDate() : false;
+                            },
+                            formatDate: function (date, format) {
+                                return moment(date).format(format);
+                            },
+                            axDate: '+60D'
+                        });
+
                        
 
-                        $("#@(startDateControlId)").datetimepicker({ format: "@datePickerFormat" }).on("dp.change", function () {
-                            RentalDatePickerSelect;
-                        });
-                        });
+                    });
+
                 </script>
-            </div>
-        </div>
-        <div class="attribute-item">
-            <div class="attribute-label">
-                <label class="text-prompt">
-                    @T("Products.RentalEndDate"):
-                </label>
-                <span class="required">*</span>
-            </div>
-            <div class="attribute-data">
-                <input id="@(endDateControlId)" name="@(endDateControlId)" type="text" class="datepicker" value="@(Model.RentalEndDate.HasValue ? Model.RentalEndDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)" @if (isMobileDevice) { <text> readonly</text>} />
-                <script asp-location="Footer">
+                <div class="attribute-label">
+                    <label class="text-prompt">
+                        @T("Products.RentalStartDate"):
+                    </label>
+                    <span class="required">*</span>
+                </div>
+                <div class="attribute-data">
+                    <input id="@(startDateControlId)" name="@(startDateControlId)" type="text" class="datepicker" value="@(Model.RentalStartDate.HasValue ? Model.RentalStartDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)" @if (isMobileDevice) { <text> readonly</text>} />
+                    <script type="text/javascript" asp-location="Footer">
                         $(document).ready(function () {
-                            $("#@(endDateControlId)").datetimepicker({ format: "@datePickerFormat" }).on("dp.change", function () {
-                                RentalDatePickerSelect ;
+                            $("#@(startDateControlId)").datetimepicker({format: 'MM/DD/YYYY h:mm a',
+                                formatTime: 'h:mm a',
+                                formatDate: 'MM/DD/YYYY',
+                                minDate: 0,
+                                onSelectDate: function (selected) {
+                                    $('#@(endDateControlId)').datepicker('option', 'minDate', selected || +1);
+                                    
+                                    onRentalDatePickerSelect();
+                                }
+                                //onSelectDate: onRentalDatePickerSelect
                             });
                         });
-                </script>
+                    </script>
+                </div>
             </div>
-        </div>
-    }
+            <div class="attribute-item">
+                <div class="attribute-label">
+                    <label class="text-prompt">
+                        @T("Products.RentalEndDate"):
+                    </label>
+                    <span class="required">*</span>
+                </div>
+                <div class="attribute-data">
+                    <input id="@(endDateControlId)" name="@(endDateControlId)" type="text" class="datepicker" value="@(Model.RentalEndDate.HasValue ? Model.RentalEndDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)" @if (isMobileDevice) { <text> readonly</text>} />
+                    <script type="text/javascript" asp-location="Footer">
+                        $(document).ready(function () {
+                            $("#@(endDateControlId)").datetimepicker({  format:'MM/DD/YYYY h:mm a',
+                                formatTime:'h:mm a',
+                                formatDate: 'MM/DD/YYYY',
+                                minDate: +1, 
+                                onSelectDate: function (selected) {
+                                    $('#@(startDateControlId)').datepicker('option', 'maxDate', selected || '+60D');
+                                    
+                                    onRentalDatePickerSelect();
+                                }
+            //                    onSelectDate: onRentalDatePickerSelect
+                            });
+                        });
 
-    <script asp-location="Footer">
+                        $.datetimepicker.setDateFormatter('moment');
+                    </script>
+                </div>
+            </div>
+        }
+
+        <script type="text/javascript" asp-location="Footer">
+            function calcDiff() {
+                
+
+                 var date1 = $('#@(startDateControlId)').datepicker('getDate');
+                  var date2 = $('#@(endDateControlId)').datepicker('getDate');
+               
+                var diff = 0;
+                var dates = '';
+                if (date1 && date2) {
+                    diff = Math.floor((date2.getTime() - date1.getTime()) / 86400000);
+                    while (date1.getTime() < date2.getTime()) {
+                        date1.setDate(date1.getDate() + 1);
+                        dates += '<br>' + $.datepicker.formatDate('d MM, yy', date1);
+                    }
+                }  
+                //$('#calculated').val(diff);
+                //$('#datesbetween').html(dates);
+            }
             function onRentalDatePickerSelect() {
                 @{
                     //almost the same implementation is used in the \Views\Product\_ProductAttributes.cshtml file
                     var productId = Model.Id;
                     if (catalogSettings.AjaxProcessAttributeChange)
                     {
-                        <text>
+                        <text> 
+               
                         $.ajax({
                             cache: false,
                             url: '@Html.Raw(Url.Action("productdetails_attributechange", "shoppingcart", new {productId = productId, validateAttributeConditions = false, loadPicture = false }))',
@@ -97,13 +142,18 @@
                                 }
                                 if (data.price) {
                                     $('.price-value-@productId').text(data.price);
-                                }
+                                }                                 
+
+                               
+
+
                             }
                         });
                         </text>
                     }
                 }
             }
-    </script>
-</div>
+        </script>
+    </div>
+
 }

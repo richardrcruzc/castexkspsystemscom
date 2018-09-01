@@ -308,12 +308,14 @@ namespace Nop.Web.Controllers
             try
             {
                 //currently we support only this format (as in the \Views\Product\_RentalInfo.cshtml file)
-                const string datePickerFormat = "MM/dd/yyyy";
+                //const string datePickerFormat = "MM/dd/yyyy";
+                const string datePickerFormat =  "M/d/yyyy h:mm tt" ; // "MM/dd/yyyy h:mm a";
                 startDate = DateTime.ParseExact(ctrlStartDate, datePickerFormat, CultureInfo.InvariantCulture);
                 endDate = DateTime.ParseExact(ctrlEndDate, datePickerFormat, CultureInfo.InvariantCulture);
             }
-            catch
+            catch(Exception ed)
             {
+                var t = ed.Message;
             }
         }
 
@@ -1047,6 +1049,10 @@ namespace Nop.Web.Controllers
                     .All(associatedProduct => associatedProduct == null || !associatedProduct.IsShipEnabled || associatedProduct.IsFreeShipping);
             }
 
+
+            var totalDays = (rentalEndDate - rentalStartDate).Value.TotalDays;
+            var totalDaysToRent = Math.Pow((rentalEndDate-rentalStartDate).Value.TotalDays, 1);
+            price = $"{price} Daily Total Days: {totalDaysToRent.ToString("#")}";
             return Json(new
             {
                 gtin,

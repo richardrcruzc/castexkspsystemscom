@@ -1288,7 +1288,10 @@ namespace Nop.Services.Catalog
             if (!product.IsRental)
                 return null;
 
-            return date.ToShortDateString();
+            // return date.ToShortDateString();
+
+            return $"{date.ToShortDateString()} {string.Format("{0:hh:mm tt}", date)}";
+
         }
 
         #endregion
@@ -2262,4 +2265,4 @@ namespace Nop.Services.Catalog
 
         #endregion
     }
-}
+};

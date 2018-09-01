@@ -401,6 +401,18 @@ namespace Nop.Web.Factories
                 cartItemModel.RentalInfo =
                     string.Format(_localizationService.GetResource("ShoppingCart.Rental.FormattedDate"),
                         rentalStartDate, rentalEndDate);
+
+
+                var totalDaysToRent = Math.Pow((sci.RentalEndDateUtc.Value - sci.RentalStartDateUtc.Value).TotalDays, 1);
+                cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Daily Price:{sci.Product.Price.ToString("#.##")} Total Days:{totalDaysToRent.ToString("#")}";
+
+                //var shoppingCartUnitPriceWithDiscountBase1 = _taxService.GetProductPrice(sci.Product, _priceCalculationService.GetUnitPrice(sci), out decimal _);
+                //var shoppingCartUnitPriceWithDiscount1 = _currencyService.ConvertFromPrimaryStoreCurrency(shoppingCartUnitPriceWithDiscountBase1, _workContext.WorkingCurrency);
+                //cartItemModel.UnitPrice = _priceFormatter.FormatPrice(shoppingCartUnitPriceWithDiscount1);
+
+
+                //price = $"{price} Total Days: {totalDaysToRent.ToString("#")}";
+
             }
 
             //unit prices
