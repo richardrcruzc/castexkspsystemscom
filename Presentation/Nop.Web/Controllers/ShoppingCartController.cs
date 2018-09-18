@@ -971,13 +971,12 @@ namespace Nop.Web.Controllers
             if (_permissionService.Authorize(StandardPermissionProvider.DisplayPrices) && !product.CustomerEntersPrice)
             {
                 //we do not calculate price of "customer enters price" option is enabled
-                List<DiscountForCaching> scDiscounts;
                 var finalPrice = _priceCalculationService.GetUnitPrice(product,
                     _workContext.CurrentCustomer,
                     ShoppingCartType.ShoppingCart,
                     1, attributeXml, 0,
                     rentalStartDate, rentalEndDate,
-                    true, out decimal _, out scDiscounts);
+                    true, out decimal _, out List<DiscountForCaching> scDiscounts);
                 var finalPriceWithDiscountBase = _taxService.GetProductPrice(product, finalPrice, out decimal _);
                 var finalPriceWithDiscount = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceWithDiscountBase, _workContext.WorkingCurrency);
                 price = _priceFormatter.FormatPrice(finalPriceWithDiscount);
@@ -1047,11 +1046,15 @@ namespace Nop.Web.Controllers
                     .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
                     .Select(attributeValue => _productService.GetProductById(attributeValue.AssociatedProductId))
                     .All(associatedProduct => associatedProduct == null || !associatedProduct.IsShipEnabled || associatedProduct.IsFreeShipping);
+
             }
 
+            var totalDaysToRent = 0;
+            if (rentalStartDate!=null &&  rentalEndDate!=null)
 
-            var totalDays = (rentalEndDate - rentalStartDate).Value.TotalDays;
-            var totalDaysToRent = Math.Pow((rentalEndDate-rentalStartDate).Value.TotalDays, 1);
+            totalDaysToRent =  _productService.GetRentalPeriods(product, rentalStartDate.Value, rentalEndDate.Value);
+
+             
             price = $"{price} Daily Total Days: {totalDaysToRent.ToString("#")}";
             return Json(new
             {

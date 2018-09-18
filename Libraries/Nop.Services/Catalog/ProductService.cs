@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Nop.Core;
 using Nop.Core.Caching;
@@ -1159,11 +1160,55 @@ namespace Nop.Services.Catalog
             int totalPeriods;
             switch (product.RentalPricePeriod)
             {
+                /*
+                    Item pricing rules to be used in the cart
+                    o	Weekends count as a single rental day
+                    o	System should be aware of AM/PM pickups and drop-offs. Examples:
+                    	If you pick up MONDAY AM and Return TUESDAY PM, we would charge a 2 day.
+                    	If you pick up MONDAY AM, Return TUESDAY AM, we would charge a 1-Day
+                    	If you pick up MONDAY PM, Return WEDNESDAY AM, we would charge 1 Day
+                    	If you pick up MONDAY PM, Return WEDNESDAY PM, we would charge 2 Day
+                    o	Rentals over 2 days are considered a 1 week rental
+                 */
                 case RentalPricePeriod.Days:
                     {
+                        var overDays = 0;
+                       var weekendDays = 0;
+
                         var totalDaysToRent = Math.Max((endDate - startDate).TotalDays, 1);
                         var configuredPeriodDays = product.RentalPriceLength;
                         totalPeriods = Convert.ToInt32(Math.Ceiling(totalDaysToRent / configuredPeriodDays));
+
+                        //throw new Exception("Not supported rental period");
+
+
+                        for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+                        {
+                            if (date.DayOfWeek == DayOfWeek.Sunday || date.DayOfWeek == DayOfWeek.Saturday)
+                                weekendDays++;
+                        }
+
+                        if (weekendDays > 1)
+                            totalPeriods--;
+
+
+                    var pmAmStart = startDate.ToString("tt", CultureInfo.InvariantCulture).ToUpper();
+                        var pmAmEnd = endDate.ToString("tt", CultureInfo.InvariantCulture).ToUpper();
+
+                        if (pmAmStart.Contains("PM") && pmAmEnd.Contains("AM"))
+                            if(totalPeriods>1)
+                                overDays = -1;
+
+                        if (pmAmStart.Contains("PM") && pmAmEnd.Contains("PM"))
+                                if (totalPeriods > 2)
+                                    overDays = -1;
+                        
+                        totalPeriods = totalPeriods + overDays;
+
+
+                        if (totalPeriods >= 3 && totalPeriods<8)
+                            totalPeriods = 7;
+
                     }
                     break;
                 case RentalPricePeriod.Weeks:

@@ -400,18 +400,7 @@ namespace Nop.Web.Factories
                     : "";
                 cartItemModel.RentalInfo =
                     string.Format(_localizationService.GetResource("ShoppingCart.Rental.FormattedDate"),
-                        rentalStartDate, rentalEndDate);
-
-
-                var totalDaysToRent = Math.Pow((sci.RentalEndDateUtc.Value - sci.RentalStartDateUtc.Value).TotalDays, 1);
-                cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Daily Price:{sci.Product.Price.ToString("#.##")} Total Days:{totalDaysToRent.ToString("#")}";
-
-                //var shoppingCartUnitPriceWithDiscountBase1 = _taxService.GetProductPrice(sci.Product, _priceCalculationService.GetUnitPrice(sci), out decimal _);
-                //var shoppingCartUnitPriceWithDiscount1 = _currencyService.ConvertFromPrimaryStoreCurrency(shoppingCartUnitPriceWithDiscountBase1, _workContext.WorkingCurrency);
-                //cartItemModel.UnitPrice = _priceFormatter.FormatPrice(shoppingCartUnitPriceWithDiscount1);
-
-
-                //price = $"{price} Total Days: {totalDaysToRent.ToString("#")}";
+                        rentalStartDate, rentalEndDate); 
 
             }
 
@@ -477,6 +466,13 @@ namespace Nop.Web.Factories
                 sci.Id);
             foreach (var warning in itemWarnings)
                 cartItemModel.Warnings.Add(warning);
+
+
+            var totalDaysToRent = _productService.GetRentalPeriods(sci.Product, sci.RentalStartDateUtc.Value, sci.RentalEndDateUtc.Value);
+
+            cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Daily Price: {_priceFormatter.FormatPrice(sci.Product.Price)} Total Days: {totalDaysToRent.ToString("#")}";
+
+
 
             return cartItemModel;
         }

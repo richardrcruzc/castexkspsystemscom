@@ -50,7 +50,7 @@
                     <span class="required">*</span>
                 </div>
                 <div class="attribute-data">
-                    <input id="@(startDateControlId)" name="@(startDateControlId)" type="text" class="datepicker" value="@(Model.RentalStartDate.HasValue ? Model.RentalStartDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)" @if (isMobileDevice) { <text> readonly</text>} />
+                    <input id="@(startDateControlId)" name="@(startDateControlId)" type="text"  value="@(Model.RentalStartDate.HasValue ? Model.RentalStartDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)" @if (isMobileDevice) { <text> readonly</text>} />
                     <script type="text/javascript" asp-location="Footer">
                         $(document).ready(function () {
                             $("#@(startDateControlId)").datetimepicker({format: 'MM/DD/YYYY h:mm a',
@@ -61,7 +61,10 @@
                                     $('#@(endDateControlId)').datepicker('option', 'minDate', selected || +1);
                                     
                                     onRentalDatePickerSelect();
-                                }
+                                }, 
+                                onSelectTime: function (selected) { 
+                                    onRentalDatePickerSelect();
+                                },
                                 //onSelectDate: onRentalDatePickerSelect
                             });
                         });
@@ -75,6 +78,7 @@
                     </label>
                     <span class="required">*</span>
                 </div>
+
                 <div class="attribute-data">
                     <input id="@(endDateControlId)" name="@(endDateControlId)" type="text" class="datepicker" value="@(Model.RentalEndDate.HasValue ? Model.RentalEndDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)" @if (isMobileDevice) { <text> readonly</text>} />
                     <script type="text/javascript" asp-location="Footer">
@@ -87,8 +91,10 @@
                                     $('#@(startDateControlId)').datepicker('option', 'maxDate', selected || '+60D');
                                     
                                     onRentalDatePickerSelect();
-                                }
-            //                    onSelectDate: onRentalDatePickerSelect
+                                },
+                                onSelectTime: function (selected) {
+                                    onRentalDatePickerSelect();
+                                },
                             });
                         });
 
@@ -100,23 +106,48 @@
 
         <script type="text/javascript" asp-location="Footer">
             function calcDiff() {
-                
 
-                 var date1 = $('#@(startDateControlId)').datepicker('getDate');
-                  var date2 = $('#@(endDateControlId)').datepicker('getDate');
-               
-                var diff = 0;
-                var dates = '';
-                if (date1 && date2) {
-                    diff = Math.floor((date2.getTime() - date1.getTime()) / 86400000);
-                    while (date1.getTime() < date2.getTime()) {
-                        date1.setDate(date1.getDate() + 1);
-                        dates += '<br>' + $.datepicker.formatDate('d MM, yy', date1);
-                    }
-                }  
-                //$('#calculated').val(diff);
-                //$('#datesbetween').html(dates);
+
+                var date1 = new Date($('#@(startDateControlId)').val());
+                var date2 = new Date($('#@(endDateControlId)').val());
+
+                var WEEK = 1000 * 60 * 60 * 24 * 7;
+
+                var date1ms = date1.getTime();
+                var date2ms = date2.getTime();
+
+                var diff = Math.abs(date2ms - date1ms);
+
+
+                var weeks = diff / WEEK;
+
+                if (weeks > 6) {
+                    alert('pickup and return date with a maximum 6 weeks');
+                    //  'add-to-cart-button-47'
+                    $('.add-to-cart-button').attr("disabled", "disabled");
+                }
+                else {
+                        $('.add-to-cart-button').removeAttr("disabled");
+                }
+            
             }
+
+            function nWeeks() {
+
+                var date1 = new Date($('#@(startDateControlId)').val());
+                var date2 =new Date($('#@(endDateControlId)').val());
+
+                var WEEK = 1000 * 60 * 60 * 24 * 7;
+
+                var date1ms = date1.getTime();
+                var date2ms = date2.getTime();
+
+                var diff = Math.abs(date2ms - date1ms);
+
+                return Math.floor(diff / WEEK);
+            }
+
+
             function onRentalDatePickerSelect() {
                 @{
                     //almost the same implementation is used in the \Views\Product\_ProductAttributes.cshtml file
@@ -124,7 +155,7 @@
                     if (catalogSettings.AjaxProcessAttributeChange)
                     {
                         <text> 
-               
+                calcDiff();
                         $.ajax({
                             cache: false,
                             url: '@Html.Raw(Url.Action("productdetails_attributechange", "shoppingcart", new {productId = productId, validateAttributeConditions = false, loadPicture = false }))',
