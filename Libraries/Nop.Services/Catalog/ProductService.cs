@@ -1195,6 +1195,10 @@ namespace Nop.Services.Catalog
                     var pmAmStart = startDate.ToString("tt", CultureInfo.InvariantCulture).ToUpper();
                         var pmAmEnd = endDate.ToString("tt", CultureInfo.InvariantCulture).ToUpper();
 
+                        if (pmAmStart.Contains("AM") && pmAmEnd.Contains("AM"))
+                            if (totalPeriods > 1)
+                                overDays = -1;
+
                         if (pmAmStart.Contains("PM") && pmAmEnd.Contains("AM"))
                             if(totalPeriods>1)
                                 overDays = -1;
