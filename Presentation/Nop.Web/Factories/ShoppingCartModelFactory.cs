@@ -470,7 +470,8 @@ namespace Nop.Web.Factories
 
             var totalDaysToRent = _productService.GetRentalPeriods(sci.Product, sci.RentalStartDateUtc.Value, sci.RentalEndDateUtc.Value);
 
-            cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Daily Price: {_priceFormatter.FormatPrice(sci.Product.Price)} Total Days: {totalDaysToRent.ToString("#")}";
+            cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Unit Price Everything is in Euros: {_priceFormatter.FormatPrice(sci.Product.Price)} Total Days: {totalDaysToRent.ToString("#")}";
+
 
 
 

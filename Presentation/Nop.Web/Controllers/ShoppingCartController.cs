@@ -1054,8 +1054,11 @@ namespace Nop.Web.Controllers
 
             totalDaysToRent =  _productService.GetRentalPeriods(product, rentalStartDate.Value, rentalEndDate.Value);
 
-             
-            price = $"{price} Daily Total Days: {totalDaysToRent.ToString("#")}";
+            if(totalDaysToRent>=7) 
+                price = $"{price} Weekly Rate {totalDaysToRent.ToString("#")} Days";
+            else
+                price = $"{price} Daily Total Days: {totalDaysToRent.ToString("#")}";
+
             return Json(new
             {
                 gtin,
