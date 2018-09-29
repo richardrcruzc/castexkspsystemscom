@@ -1,6 +1,6 @@
 ﻿{
   "Group": "Payment methods",
-  "FriendlyName": "Check / Money Order",
+  "FriendlyName": "This is being submitted for an estimate only and an official quote will be provided by the rental department shortly by email. ",
   "SystemName": "Payments.CheckMoneyOrder",
   "Version": "1.38",
   "SupportedVersions": [ "4.10" ],

@@ -705,6 +705,8 @@ namespace Nop.Web.Controllers
             //model
             var paymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
 
+            _paymentSettings.BypassPaymentMethodSelectionIfOnlyOne = true;
+
             if (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne &&
                 paymentMethodModel.PaymentMethods.Count == 1 && !paymentMethodModel.DisplayRewardPoints)
             {
@@ -743,6 +745,7 @@ namespace Nop.Web.Controllers
                 return Challenge();
 
             //reward points
+            _rewardPointsSettings.Enabled = false;
             if (_rewardPointsSettings.Enabled)
             {
                 _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
@@ -1029,6 +1032,8 @@ namespace Nop.Web.Controllers
 
                 //payment is required
                 var paymentMethodModel = _checkoutModelFactory.PreparePaymentMethodModel(cart, filterByCountryId);
+
+                _paymentSettings.BypassPaymentMethodSelectionIfOnlyOne = true;
 
                 if (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne &&
                     paymentMethodModel.PaymentMethods.Count == 1 && !paymentMethodModel.DisplayRewardPoints)

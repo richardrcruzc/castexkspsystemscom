@@ -467,8 +467,9 @@ namespace Nop.Web.Factories
             foreach (var warning in itemWarnings)
                 cartItemModel.Warnings.Add(warning);
 
-
-            var totalDaysToRent = _productService.GetRentalPeriods(sci.Product, sci.RentalStartDateUtc.Value, sci.RentalEndDateUtc.Value);
+            var totalDaysToRent = 0;
+            if (sci.RentalStartDateUtc.HasValue && sci.RentalEndDateUtc.HasValue)
+              totalDaysToRent = _productService.GetRentalPeriods(sci.Product, sci.RentalStartDateUtc.Value, sci.RentalEndDateUtc.Value);
 
             cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Unit Price Everything is in Euros: {_priceFormatter.FormatPrice(sci.Product.Price)} Total Days: {totalDaysToRent.ToString("#")}";
 
