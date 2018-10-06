@@ -53,7 +53,9 @@
                     <input id="@(startDateControlId)" name="@(startDateControlId)" type="text"  value="@(Model.RentalStartDate.HasValue ? Model.RentalStartDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)"  readonly  />
                     <script type="text/javascript" asp-location="Footer">
                         $(document).ready(function () {
-                            $("#@(startDateControlId)").datetimepicker({format: 'MM/DD/YYYY h:mm a',
+                            $("#@(startDateControlId)").datetimepicker({ 
+                                disabledWeekDays:[0],
+                                format: 'MM/DD/YYYY h:mm a',
                                 formatTime: 'h:mm a',
                                 formatDate: 'MM/DD/YYYY',
                                 minDate: 0,
@@ -65,7 +67,8 @@
                                 onSelectTime: function (selected) { 
                                     onRentalDatePickerSelect();
                                 },
-                                //onSelectDate: onRentalDatePickerSelect
+                                onShow: logic,
+                                onChangeDateTime: logic,
                             });
                         });
                     </script>
@@ -83,7 +86,9 @@
                     <input id="@(endDateControlId)" name="@(endDateControlId)" type="text" class="datepicker" value="@(Model.RentalEndDate.HasValue ? Model.RentalEndDate.Value.ToString(datePickerFormat2, CultureInfo.InvariantCulture) : null)"  readonly  />
                     <script type="text/javascript" asp-location="Footer">
                         $(document).ready(function () {
-                            $("#@(endDateControlId)").datetimepicker({  format:'MM/DD/YYYY h:mm a',
+                            $("#@(endDateControlId)").datetimepicker({ 
+                                disabledWeekDays: [0],
+                                format: 'MM/DD/YYYY h:mm a',
                                 formatTime:'h:mm a',
                                 formatDate: 'MM/DD/YYYY',
                                 minDate: +1, 
@@ -95,6 +100,8 @@
                                 onSelectTime: function (selected) {
                                     onRentalDatePickerSelect();
                                 },
+                                onShow: logic,
+                                onChangeDateTime: logic,
                             });
                         });
 
@@ -105,6 +112,21 @@
         }
 
         <script type="text/javascript" asp-location="Footer">
+           function logic(currentDateTime) {
+                // 'this' is jquery object datetimepicker
+                if (currentDateTime.getDay() == 6) {
+                    this.setOptions({
+                        minTime: '09:00 am',
+                        maxTime: '01:00 pm',
+                    });
+                } else
+                    this.setOptions({
+                        minTime: '07:00 am',
+                        maxTime: '05:00 pm'
+                    });
+            };
+
+
             function calcDiff() {
 
 

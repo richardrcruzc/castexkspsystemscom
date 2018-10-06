@@ -471,7 +471,7 @@ namespace Nop.Web.Factories
             if (sci.RentalStartDateUtc.HasValue && sci.RentalEndDateUtc.HasValue)
               totalDaysToRent = _productService.GetRentalPeriods(sci.Product, sci.RentalStartDateUtc.Value, sci.RentalEndDateUtc.Value);
 
-            cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Unit Price Everything is in Euros: {_priceFormatter.FormatPrice(sci.Product.Price)} Total Days: {totalDaysToRent.ToString("#")}";
+            cartItemModel.RentalInfo = $"{cartItemModel.RentalInfo} Unit Price: {_priceFormatter.FormatPrice(sci.Product.Price)} Total Days: {totalDaysToRent.ToString("#")}";
 
 
 
